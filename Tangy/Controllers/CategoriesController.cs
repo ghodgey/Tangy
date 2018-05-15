@@ -54,7 +54,7 @@ namespace Tangy.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,DisplayOrder")] Category category)
+        public async Task<IActionResult> Create(Category category)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace Tangy.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,DisplayOrder")] Category category)
+        public async Task<IActionResult> Edit(int id, Category category)
         {
             if (id != category.Id)
             {
@@ -135,6 +135,9 @@ namespace Tangy.Controllers
         }
 
         // POST: Categories/Delete/5
+
+        //this was called deleteconfirmed because we can cant have two methods 
+        //with the same name that takes in the same amount of overloads
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
