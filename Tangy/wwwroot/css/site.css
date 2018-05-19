@@ -46,7 +46,10 @@
 .footer > .cont{
     padding-left: 15px;
     padding-right: 15px;
-    min-height:100%;
+    
+}
+html {
+    min-height: 100%;
     position: relative;
 }
 
