@@ -5,6 +5,11 @@
     <UserSecretsId>aspnet-Tangy-07C1E926-9363-4993-B240-1CAD4070614A</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20180527094024_CouponMinAmntAndDiscountNullableTypes.cs" />
+    <Compile Remove="Data\Migrations\20180527094024_CouponMinAmntAndDiscountNullableTypes.Designer.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />

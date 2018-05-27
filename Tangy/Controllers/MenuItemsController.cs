@@ -108,6 +108,7 @@ namespace Tangy.Controllers
                 .ToList();
 
             return Json(new SelectList(subCategoryList, "Id", "Name"));
+            
         }
 
         //Get edit menu item
@@ -162,12 +163,15 @@ namespace Tangy.Controllers
                             .Substring(files[0].FileName.LastIndexOf("."),
                             files[0].FileName.Length - files[0].FileName.LastIndexOf("."));
 
-                        var extension_Old = menuItemFromDb.Image
-                            .Substring(menuItemFromDb.Image.LastIndexOf("."),
-                            menuItemFromDb.Image.Length - menuItemFromDb.Image.LastIndexOf("."));
-
-                        if (System.IO.File.Exists(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension_Old)))
-                            System.IO.File.Delete(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension_Old));
+                        if (menuItemFromDb.Image != null)
+                        {
+                            var extension_Old = menuItemFromDb.Image
+                                .Substring(menuItemFromDb.Image.LastIndexOf("."),
+                                menuItemFromDb.Image.Length - menuItemFromDb.Image.LastIndexOf("."));
+                            if (System.IO.File.Exists(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension_Old)))
+                                System.IO.File.Delete(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension_Old));
+                        }
+                        
 
                         using (var filestream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.Id + extension_New), FileMode.Create))
                             files[0].CopyTo(filestream);
