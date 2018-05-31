@@ -11,9 +11,10 @@ using Tangy.Data;
 namespace Tangy.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180528124419_AddFirstNameAndLastNameToDb")]
+    partial class AddFirstNameAndLastNameToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

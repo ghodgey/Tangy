@@ -4,11 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace Tangy.Models.AccountViewModels
 {
     public class RegisterViewModel
     {
         [Required]
+        [CheckEmailExtension("@gmail")]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
@@ -23,5 +25,20 @@ namespace Tangy.Models.AccountViewModels
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        
+        [Required]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
+
+        [Required]
+        [Phone]
+        [Display(Name = "Phone Number")]
+        public string PhoneNumber { get; set; }
+
     }
 }

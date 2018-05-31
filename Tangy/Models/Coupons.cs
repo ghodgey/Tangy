@@ -28,6 +28,7 @@ namespace Tangy.Models
 
         public byte[] Picture { get; set; }
 
+        [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
 
 
