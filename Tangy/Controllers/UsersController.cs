@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,11 @@ using Tangy.Data;
 using Tangy.Models;
 using Tangy.Models.AccountViewModels;
 using Tangy.Models.ManageViewModels;
+using Tangy.Utility;
 
 namespace Tangy.Controllers
 {
+    [Authorize(Roles = SD.AdminEndUser)]
     public class UsersController : Controller
     {
         private readonly ApplicationDbContext _db;
