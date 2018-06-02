@@ -8,6 +8,7 @@ namespace Tangy.Models.ManageViewModels
 {
     public class IndexViewModel
     {
+        public string Id { get; set; }
         public string Username { get; set; }
 
         public bool IsEmailConfirmed { get; set; }
@@ -29,6 +30,16 @@ namespace Tangy.Models.ManageViewModels
         [Required]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
+
+        [Display(Name = "Lockout Reason")]
+        public string LockoutReason { get; set; }
+
+        [Display(Name = "Lockout End date")]
+        public DateTimeOffset? LockoutEnd { get; set; }
+
+        [Display(Name = "Access Fail Count")]
+        public int AccessFailedCount { get; set; }
+
 
     }
 }

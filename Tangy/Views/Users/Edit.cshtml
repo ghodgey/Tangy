@@ -1,0 +1,101 @@
+﻿@model IndexViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+<br />
+
+<div class="form-border">
+    <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="FirstName"></label>
+            </div>
+            <div class="col-4">
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="LastName"></label>
+            </div>
+            <div class="col-4">
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="PhoneNumber"></label>
+            </div>
+            <div class="col-4">
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="Email"></label>
+            </div>
+            <div class="col-4">
+                <input asp-for="Email" disabled class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="LockoutEnd"></label>
+            </div>
+            <div class="col-4">
+                <input id="datepicker" type="text" asp-for="LockoutEnd" class="form-control" />
+                <span asp-validation-for="LockoutEnd" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="LockoutReason"></label>
+            </div>
+            <div class="col-4">
+                <textarea rows="5" cols="50" asp-for="LockoutReason" class="form-control">Enter lockout reason...</textarea>
+                <span asp-validation-for="LockoutReason" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label asp-for="AccessFailedCount"></label>
+            </div>
+            <div class="col-4">
+                <input asp-for="AccessFailedCount" disabled class="form-control" />
+                <span asp-validation-for="AccessFailedCount" class="text-danger"></span>
+            </div>
+        </div>
+        <br />
+        <button type="submit" class="btn btn-outline-primary">Update</button>
+        <a asp-action="Index" class="btn btn-outline-success">Back to List</a>
+
+    </form>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script type="text/javascript">
+        $(function () {
+            $("#datepicker").datepicker({
+                defaultDate: "+1w",
+                changeMonth: true,
+                changeYear: true
+            })
+        });
+
+
+    </script>
+
+}
+
