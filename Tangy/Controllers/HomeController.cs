@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Tangy.Data;
@@ -43,9 +46,82 @@ namespace Tangy.Controllers
 
         }
 
-        public IActionResult Error()
+        //Get
+        [Authorize]
+        public async Task<IActionResult> Details(int id)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var MenuItemFromDb = await _db.MenuItem
+                .Include(m => m.Category)
+                .Include(m => m.SubCategory)
+                .Where(m => m.Id == id)
+                .FirstOrDefaultAsync();
+
+            ShoppingCart CartObj = new ShoppingCart()
+            {
+                MenuItem = MenuItemFromDb,
+                MenuItemId = MenuItemFromDb.Id
+            };
+
+            return View(CartObj);
+
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Details(ShoppingCart CartObject)
+        {
+            CartObject.Id = 0;
+
+            if(ModelState.IsValid)
+            {
+                var claimsIdentity = (ClaimsIdentity)this.User.Identity;
+                var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+                CartObject.ApplicationUserId = claim.Value;
+
+                var cartFromDb = await _db.ShoppingCart
+                    .Where(c => c.ApplicationUserId == CartObject.ApplicationUserId && c.MenuItemId == CartObject.MenuItemId)
+                    .FirstOrDefaultAsync();
+
+                if (cartFromDb == null)
+                {
+                    //this menu item does not exist
+                    _db.ShoppingCart.Add(CartObject);
+                }
+                else
+                {
+                    //Menu item exists in the shopping cart for that user, just update the count
+                    cartFromDb.Count = cartFromDb.Count + CartObject.Count;
+                }
+
+                await _db.SaveChangesAsync();
+
+                var count = _db.ShoppingCart
+                    .Where(c => c.ApplicationUserId == CartObject.ApplicationUserId)
+                    .ToList()
+                    .Count();
+
+                HttpContext.Session.SetInt32("CartCount", count); //in startup add services session (storing the count of the session for the items in the shooping cart for a user
+
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                var MenuItemFromDb = await _db.MenuItem
+                .Include(m => m.Category)
+                .Include(m => m.SubCategory)
+                .Where(m => m.Id == CartObject.MenuItemId)
+                .FirstOrDefaultAsync();
+
+                ShoppingCart CartObj = new ShoppingCart()
+                {
+                    MenuItem = MenuItemFromDb,
+                    MenuItemId = MenuItemFromDb.Id
+                };
+
+                return View(CartObj);
+            }
         }
     }
 }
