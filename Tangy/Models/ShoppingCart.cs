@@ -19,7 +19,6 @@ namespace Tangy.Models
         [ForeignKey("MenuItemId")]
         public virtual MenuItem MenuItem { get; set; }
 
-
         [NotMapped]
         [ForeignKey("ApplicationUserId")]
         public virtual ApplicationUser ApplicationUser { get; set; }
