@@ -17,6 +17,8 @@ namespace Tangy.Controllers
     {
         private readonly ApplicationDbContext _db;
 
+        public static object ECouponType { get; internal set; }
+
         public CouponsController(ApplicationDbContext db)
         {
             _db = db;
