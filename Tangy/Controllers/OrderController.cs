@@ -52,9 +52,11 @@ namespace Tangy.Controllers
 
             foreach (OrderHeader item in OrderHeaderList)
             {
-                OrderDetailsViewModel individual = new OrderDetailsViewModel();
-                individual.OrderHeader = item;
-                individual.OrderDetail = _db.OrderDetails.Where(o => o.OrderId == item.Id).ToList();
+                OrderDetailsViewModel individual = new OrderDetailsViewModel
+                {
+                    OrderHeader = item,
+                    OrderDetail = _db.OrderDetails.Where(o => o.OrderId == item.Id).ToList()
+                };
                 OrderDetailsVM.Add(individual);
             }
 
@@ -75,13 +77,111 @@ namespace Tangy.Controllers
 
             foreach (OrderHeader item in OrderHeaderList)
             {
-                OrderDetailsViewModel individual = new OrderDetailsViewModel();
-                individual.OrderHeader = item;
-                individual.OrderDetail = _db.OrderDetails.Where(o => o.OrderId == item.Id).ToList();
+                OrderDetailsViewModel individual = new OrderDetailsViewModel
+                {
+                    OrderHeader = item,
+                    OrderDetail = _db.OrderDetails.Where(o => o.OrderId == item.Id).ToList()
+                };
                 OrderDetailsVM.Add(individual);
             }
 
             return View(OrderDetailsVM);
         }
+
+        [Authorize(Roles = SD.AdminEndUser)]
+        public async Task<IActionResult> OrderPrepare(int orderId)
+        {
+            OrderHeader orderHeader = _db.OrderHeader.Find(orderId);
+            orderHeader.Status = SD.StatusInProcess;
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction("ManageOrder", "Order");
+        }
+
+        [Authorize(Roles = SD.AdminEndUser)]
+        public async Task<IActionResult> OrderCancel(int orderId)
+        {
+            OrderHeader orderHeader = _db.OrderHeader.Find(orderId);
+            orderHeader.Status = SD.StatusCancelled;
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction("ManageOrder", "Order");
+        }
+
+        [Authorize(Roles = SD.AdminEndUser)]
+        public async Task<IActionResult> OrderReady(int orderId)
+        {
+            OrderHeader orderHeader = _db.OrderHeader.Find(orderId);
+            orderHeader.Status = SD.StatusReady;
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction("ManageOrder", "Order");
+        }
+
+        //Get order pickup
+        public IActionResult OrderPickup(string searchEmail = null, string searchPhone = null, string searchOrder = null)
+        {
+
+            List<OrderDetailsViewModel> OrderDetailsVM = new List<OrderDetailsViewModel>();
+
+            if (searchEmail != null || searchPhone != null || searchOrder != null)
+            {
+                //filtering the criteria
+                var user = new ApplicationUser();
+                List<OrderHeader> OrderHeaderList = new List<OrderHeader>();
+
+                if (searchOrder != null)
+                {
+                    OrderHeaderList = _db.OrderHeader.Where(o => o.Id == Convert.ToInt32(searchOrder)).ToList();
+                }
+                else if (searchEmail != null)
+                {
+                    user = _db.Users.Where(u => u.Email.ToLower().Contains(searchEmail.ToLower())).FirstOrDefault();
+                }
+                else if (searchPhone != null)
+                {
+                    user = _db.Users.Where(u => u.PhoneNumber.ToLower().Contains(searchPhone.ToLower())).FirstOrDefault();
+
+                }
+                if (user != null || OrderHeaderList.Count > 0)
+                {
+                    if (OrderHeaderList.Count == 0)
+                    {
+                        OrderHeaderList = _db.OrderHeader.Where(o => o.UserId == user.Id).OrderByDescending(o => o.OrderDate).ToList();
+                    }
+
+                    foreach(OrderHeader item in OrderHeaderList)
+                    {
+                        OrderDetailsViewModel individual = new OrderDetailsViewModel
+                        {
+                            OrderHeader = item,
+                            OrderDetail = _db.OrderDetails.Where(o => o.OrderId == item.Id).ToList()
+                        };
+                        OrderDetailsVM.Add(individual);
+                    }
+                }
+            }
+            else
+            {
+                List<OrderHeader> OrderHeaderList = _db.OrderHeader
+                    .Where(o => o.Status == SD.StatusReady)
+                    .OrderByDescending(u => u.PickupTime)
+                    .ToList();
+
+                foreach (OrderHeader item in OrderHeaderList)
+                {
+                    OrderDetailsViewModel individual = new OrderDetailsViewModel
+                    {
+                        OrderHeader = item,
+                        OrderDetail = _db.OrderDetails.Where(o => o.OrderId == item.Id).ToList()
+                    };
+                    OrderDetailsVM.Add(individual);
+                }
+            }
+            return View(OrderDetailsVM);
+        }
+
+
+
     }
 }

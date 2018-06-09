@@ -1,5 +1,5 @@
 ﻿@model List<Tangy.Models.OrderDetailsViewModels.OrderDetailsViewModel>
-
+@using Tangy.Utility
 
 @{
     ViewData["Title"] = "ManageOrder";
@@ -10,16 +10,38 @@
 <form method="post">
     <br />
 
-    @if(Model.Count > 0)
-    { 
-        @foreach(var item in Model)
+    @if (Model.Count > 0)
+    {
+        @foreach (var item in Model)
         {
             <div class="container row">
                 <div class="col-10">
                     @Html.Partial("_IndividualOrder", item)
                 </div>
                 <div class="col-2">
+                    @if (item.OrderHeader.Status.Equals(SD.StatusSubmitted))
+                    {
+                    <button type="submit" asp-action="OrderPrepare" asp-route-orderId="@item.OrderHeader.Id" class="btn btn-primary form-control">
+                        <i class="fa-fw fas fa-check"></i>&nbsp;Start Cooking
+                    </button>
+                        <button type="submit" asp-action="OrderCancel" asp-route-orderId="@item.OrderHeader.Id" class="btn btn-danger form-control">
+                            <i class="fa-fw fas fa-times"></i>Cancel Order
+                        </button>
+                    }
+                    else
+                    {
+                        @if (item.OrderHeader.Status.Equals(SD.StatusInProcess))
+                        {
+                            <button type="submit" asp-action="OrderReady" asp-route-orderId="@item.OrderHeader.Id" class="btn btn-success form-control">
+                                <i class="fa-fw fas fa-flag-checkered fa-fw"></i>Prepared
+                            </button>
+                            <button type="submit" asp-action="OrderCancel" asp-route-orderId="@item.OrderHeader.Id" class="btn btn-danger form-control">
+                                <i class="fa-fw fas fa-times"></i>Cancel Order
+                            </button>
+                        }
 
+
+                    }
                 </div>
             </div>
 
