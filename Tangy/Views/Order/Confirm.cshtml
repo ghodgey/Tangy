@@ -1,0 +1,23 @@
+﻿@model Tangy.Models.OrderDetailsViewModels.OrderDetailsViewModel
+
+
+
+@{
+    ViewData["Title"] = "Confirm";
+}
+
+<h2>Confirm Order Details</h2>
+
+<br/>
+
+@if (Model.OrderHeader != null)
+{
+    @Html.Partial("_IndividualOrder", Model)
+
+    <a asp-action="Index" asp-controller="Home" class="btn btn-success">Place Another Order</a>
+
+}
+else
+{
+    <div class="text-danger">Error, please try again</div>
+}

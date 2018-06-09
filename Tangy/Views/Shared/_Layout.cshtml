@@ -34,7 +34,7 @@
 
                 @if (User.IsInRole(SD.AdminEndUser) || User.IsInRole(SD.CustomerEndUser))
                 {
-                    <li class="nav-item"><a class="nav-link" href="#">Order History</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Order" asp-action="OrderHistory">Order History</a></li>
                 }
 
                 @if (User.IsInRole(SD.AdminEndUser))
@@ -56,7 +56,7 @@
                             Order
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Manage Order</a>
+                            <a class="dropdown-item" asp-controller="Order" asp-action="ManageOrder">Manage Order</a>
                             <a class="dropdown-item" href="#">Order Pickup</a>
                             <a class="dropdown-item" href="#">Download Order Details</a>
                         </div>

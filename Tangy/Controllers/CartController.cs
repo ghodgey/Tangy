@@ -5,9 +5,11 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Tangy.Data;
 using Tangy.Models;
 using Tangy.Models.OrderDetailsViewModels;
+using Tangy.Utility;
 
 namespace Tangy.Controllers
 {
@@ -57,6 +59,49 @@ namespace Tangy.Controllers
             return View(DetailsCart);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Index")]
+        public IActionResult IndexPost()
+        {
+            var claimsIdentity = (ClaimsIdentity)this.User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            DetailsCart.ListCart = _db.ShoppingCart.Where(c => c.ApplicationUserId == claim.Value).ToList();
+
+            DetailsCart.OrderHeader.OrderDate = DateTime.Now;
+            DetailsCart.OrderHeader.UserId = claim.Value;
+            DetailsCart.OrderHeader.Status = SD.StatusSubmitted;
+
+            OrderHeader orderHeader = DetailsCart.OrderHeader;
+
+            _db.OrderHeader.Add(orderHeader);
+            _db.SaveChanges();
+
+            foreach(var item in DetailsCart.ListCart)
+            {
+                item.MenuItem = _db.MenuItem.FirstOrDefault(m => m.Id == item.MenuItemId);
+                OrderDetails orderDetails = new OrderDetails()
+                {
+                    MenuItemId = item.MenuItemId,
+                    OrderId = orderHeader.Id,
+                    Description = item.MenuItem.Description,
+                    Name = item.MenuItem.Name,
+                    Price = item.MenuItem.Price,
+                    Count = item.Count
+                };
+                _db.OrderDetails.Add(orderDetails);
+            }
+
+            _db.ShoppingCart.RemoveRange(DetailsCart.ListCart);
+            _db.SaveChanges();
+            HttpContext.Session.SetInt32("CartCount", 0);
+
+            return RedirectToAction("Confirm", "Order", new { id = orderHeader.Id });
+
+
+        }
+
         public IActionResult Plus(int cartId)
         {
             var cart = _db.ShoppingCart.Where(c => c.Id == cartId).FirstOrDefault();
@@ -65,6 +110,7 @@ namespace Tangy.Controllers
             return RedirectToAction(nameof(Index));
 
         }
+
         public IActionResult Minus(int cartId)
         {
             var cart = _db.ShoppingCart.Where(c => c.Id == cartId).FirstOrDefault();
