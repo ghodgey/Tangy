@@ -150,7 +150,7 @@ namespace Tangy.Controllers
                         OrderHeaderList = _db.OrderHeader.Where(o => o.UserId == user.Id).OrderByDescending(o => o.OrderDate).ToList();
                     }
 
-                    foreach(OrderHeader item in OrderHeaderList)
+                    foreach (OrderHeader item in OrderHeaderList)
                     {
                         OrderDetailsViewModel individual = new OrderDetailsViewModel
                         {
@@ -180,6 +180,42 @@ namespace Tangy.Controllers
             }
             return View(OrderDetailsVM);
         }
+
+        [Authorize(Roles = SD.AdminEndUser)]
+        public IActionResult OrderPickupDetails(int orderId)
+        {
+            OrderDetailsViewModel OrderDetailsVM = new OrderDetailsViewModel
+            {
+                OrderHeader = _db.OrderHeader.Where(o => o.Id == orderId).FirstOrDefault(),
+
+
+            };
+
+            OrderDetailsVM.OrderHeader.ApplicationUser = _db.Users
+                .Where(u => u.Id == OrderDetailsVM.OrderHeader.UserId)
+                .FirstOrDefault();
+
+            OrderDetailsVM.OrderDetail = _db.OrderDetails.Where(o => o.OrderId == OrderDetailsVM.OrderHeader.Id).ToList();
+
+            return View(OrderDetailsVM);
+
+        }
+
+        [HttpPost]
+        [Authorize(Roles = SD.AdminEndUser)]
+        [ValidateAntiForgeryToken]
+        [ActionName("OrderPickupDetails")]
+        public async Task<IActionResult> OrderPickupDetailsPost(int orderId)
+        {
+            OrderHeader orderHeader = _db.OrderHeader.Find(orderId);
+            orderHeader.Status = SD.StatusCompleted;
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction("OrderPickup", "Order");
+
+
+        }
+
 
 
 
