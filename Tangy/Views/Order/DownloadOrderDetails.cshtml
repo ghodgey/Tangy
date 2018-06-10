@@ -37,26 +37,44 @@
 </form>
 
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script type="text/javascript">
         $(function () {
-            $("#datePickerStart").datepicker({
-                defaultDate: "+1w",
-                changeMonth: true,
-                changeYear: true
-            })
+            var dateFormat = "mm/dd/yy",
+                from = $("#datePickerStart")
+                    .datepicker({
+                        changeMonth: true,
+                        changeYear: true,
+                        maxDate: "+0D"
+                    })
+                    .on("change", function () {
+                        to.datepicker("option", "minDate", getDate(this));
+                    }),
+                to = $("#datePickerEnd").datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    changeYear: true,
+                    maxDate: "+0D"
+
+                })
+                    .on("change", function () {
+                        from.datepicker("option", "maxDate", getDate(this));
+                    });
+
+            function getDate(element) {
+                var date;
+                try {
+                    date = $.datepicker.parseDate(dateFormat, element.value);
+                } catch (error) {
+                    date = null;
+                }
+
+                return date;
+            }
         });
-
-        $(function () {
-            $("#datePickerEnd").datepicker({
-                defaultDate: "+1w",
-                changeMonth: true,
-                changeYear: true
-            })
-        });
-
-
     </script>
+
+
+
 
 }
