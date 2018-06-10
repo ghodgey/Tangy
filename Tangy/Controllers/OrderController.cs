@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Tangy.Data;
 using Tangy.Models;
 using Tangy.Models.OrderDetailsViewModels;
@@ -216,7 +220,92 @@ namespace Tangy.Controllers
 
         }
 
+        //Get
+        public IActionResult DownloadOrderDetails(DateTime? startDate, DateTime? endDate)
+        {
+            if (startDate == null || endDate == null)
+                return View();
 
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                //List<OrderHeader> OrderHeaderList = _db.OrderHeader
+                //    .Where(u => u.OrderDate >= startDate && u.OrderDate <= endDate)
+                //   .OrderByDescending(u => u.OrderDate)
+                //   .ToList();
+
+
+
+                //var OrderDetailsList = new List<OrderDetails>();
+
+                //query related table -> doesn't require you to load the details of OrderHeader
+                var OrderDetailsList = _db.OrderDetails
+                    .Where(o => o.OrderHeader.OrderDate >= startDate && o.OrderHeader.OrderDate <= endDate)
+                    .Select(o => new { o.Id, o.OrderId, o.Count, o.Name, o.Price })
+                    .ToList();
+
+                
+                var csvString = ConvertToString(OrderDetailsList);
+                var fileName = "OrderDetails_" + DateTime.Now.ToString() + ".csv";
+                return File(new System.Text.UTF8Encoding().GetBytes(csvString), "text/csv", fileName);
+
+
+
+            }
+
+            return View();
+        }
+        public String ConvertToString<T>(IList<T> data)
+        {
+
+            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(typeof(T));
+
+            DataTable table = new DataTable();
+
+            foreach (PropertyDescriptor prop in properties)
+
+            {
+
+                table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
+
+            }
+
+            foreach (T item in data)
+
+            {
+
+                DataRow row = table.NewRow();
+
+                foreach (PropertyDescriptor prop in properties)
+
+                {
+
+                    row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
+
+                }
+
+                table.Rows.Add(row);
+
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            IEnumerable<string> columnNames = table.Columns.Cast<DataColumn>().Select(column => column.ColumnName);
+
+            sb.AppendLine(string.Join(",", columnNames));
+
+            foreach (DataRow row in table.Rows)
+
+            {
+
+                IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
+
+                sb.AppendLine(string.Join(",", fields));
+
+            }
+
+            return sb.ToString();
+
+        }
 
 
     }
