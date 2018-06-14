@@ -236,7 +236,8 @@ namespace Tangy.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser {
+                var user = new ApplicationUser
+                {
                     UserName = model.Email,
                     Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
@@ -248,9 +249,23 @@ namespace Tangy.Controllers
                 if (result.Succeeded)
                 {
 
-                    if(! await _roleManager.RoleExistsAsync(SD.AdminEndUser)) // check is the role exists - checks the ASPNETRoles Table
+                    if (!await _roleManager.RoleExistsAsync(SD.AdminEndUser)) // check is the role exists - checks the ASPNETRoles Table
                     {
                         await _roleManager.CreateAsync(new IdentityRole(SD.AdminEndUser));
+                        var userAdmin = new ApplicationUser
+                        {
+                            UserName = "admin@gmail.com",
+                            Email = "admin@gmail.com",
+                            PhoneNumber = "01064790251",
+                            FirstName = "Admin",
+                            LastName = "Istrator"
+
+                        };
+                        var resultAdmin = await _userManager.CreateAsync(userAdmin, "Admin123!"); //adds the user - we then need to assign this user to admin role
+                        await _userManager.AddToRoleAsync(userAdmin, SD.AdminEndUser);//When registering adds the user as an admin user
+
+
+
                     }
 
                     if (!await _roleManager.RoleExistsAsync(SD.CustomerEndUser)) // check is the role exists - checks the ASPNETRoles Table
@@ -258,8 +273,16 @@ namespace Tangy.Controllers
                         await _roleManager.CreateAsync(new IdentityRole(SD.CustomerEndUser));
                     }
 
-                    //await _userManager.AddToRoleAsync(user, SD.AdminEndUser);//When registering adds the user as an admin user
+                    //if (user.Email == "admin@gmail.com")
+                    //{
+                    //    await _userManager.AddToRoleAsync(user, SD.AdminEndUser);//When registering adds the user as an admin user
+
+                    //}
+                    //else
+                    //{ }
                     await _userManager.AddToRoleAsync(user, SD.CustomerEndUser);
+
+
 
 
 
